@@ -34,45 +34,24 @@ def bereken_bmi(gewicht, lengte_cm):
 
 def geef_bmi_advies(bmi):
     if bmi < 18.5:
-        return (
-            "Je hebt ondergewicht. Het is belangrijk om een gezond gewicht te bereiken. "
-            "Overweeg om meer voedzame maaltijden te eten en regelmatig te bewegen."
-        )
+        return "Je hebt ondergewicht. Probeer genoeg en voedzaam te eten."
     elif bmi < 25:
-        return (
-            "Je hebt een gezond gewicht. Blijf zo doorgaan met een gebalanceerd dieet "
-            "en regelmatige lichaamsbeweging!"
-        )
+        return "Je hebt een gezond gewicht. Blijf zo doorgaan."
     elif bmi < 30:
-        return (
-            "Je hebt overgewicht. Overweeg om meer te bewegen en gezondere voedingskeuzes "
-            "te maken."
-        )
+        return "Je hebt overgewicht. Meer beweging en gezondere keuzes kunnen helpen."
     else:
-        return (
-            "Je hebt obesitas. Overweeg om een professional te raadplegen voor advies "
-            "over voeding en lichaamsbeweging."
-        )
+        return "Je hebt obesitas. Overweeg om professioneel advies te vragen."
 
 
 def geef_leefstijl_advies(keuze):
     keuze = keuze.lower().strip()
 
     if keuze == "voeding":
-        return (
-            "Voor voeding is het belangrijk om een gebalanceerd dieet te volgen met "
-            "groenten, fruit, volkoren producten en voldoende eiwitten."
-        )
+        return "Let op een gebalanceerd dieet met genoeg eiwitten, groente en fruit."
     elif keuze == "beweging":
-        return (
-            "Voor beweging is het aan te raden om regelmatig actief te zijn. Denk aan "
-            "wandelen, fietsen, krachttraining of een sport die je leuk vindt."
-        )
+        return "Probeer regelmatig te bewegen en kies sporten die je vol kunt houden."
     elif keuze == "beide":
-        return (
-            "Voor een gezonde levensstijl is het belangrijk om zowel op voeding als "
-            "beweging te letten. Combineer gezond eten met regelmatige training."
-        )
+        return "Combineer gezonde voeding met regelmatige training voor het beste resultaat."
     else:
         return "Ongeldige keuze. Kies 'voeding', 'beweging' of 'beide'."
 
@@ -82,10 +61,7 @@ def maak_profiel():
 
     naam = vraag_tekst("Wat is je naam? ")
 
-    print(
-        f"\nHallo {naam}! Welkom bij de FitHelper app. "
-        "Beantwoord de komende vragen om jouw startprofiel te maken.\n"
-    )
+    print(f"\nHallo {naam}! Welkom bij de FitHelper app.\n")
 
     leeftijd = int(vraag_getal("Wat is je leeftijd? ", 10, 100))
     gewicht = vraag_getal("Wat is je gewicht in kg? ", 30, 250)
@@ -154,17 +130,20 @@ def maak_workout():
     return workout
 
 
+def lees_workouts():
+    try:
+        with open("data/workouts.json", "r", encoding="utf-8") as bestand:
+            return json.load(bestand)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+
 def sla_workout_op(workout):
     os.makedirs("data", exist_ok=True)
 
-    try:
-        with open("data/workouts.json", "r", encoding="utf-8") as bestand:
-            workouts = json.load(bestand)
-    except FileNotFoundError:
-        workouts = []
-    except json.JSONDecodeError:
-        workouts = []
-
+    workouts = lees_workouts()
     workouts.append(workout)
 
     with open("data/workouts.json", "w", encoding="utf-8") as bestand:
@@ -192,10 +171,95 @@ def toon_workout_overzicht(workout):
     print(f"Volume: {workout['volume']} kg")
 
 
+def toon_alle_workouts():
+    workouts = lees_workouts()
+
+    print("\n--- Workout geschiedenis ---")
+
+    if len(workouts) == 0:
+        print("Er zijn nog geen workouts opgeslagen.")
+        return
+
+    for index, workout in enumerate(workouts, start=1):
+        print(f"\nWorkout {index}")
+        print(f"Datum: {workout['datum']}")
+        print(f"Oefening: {workout['oefening']}")
+        print(f"Sets: {workout['sets']}")
+        print(f"Reps: {workout['reps']}")
+        print(f"Gewicht: {workout['gewicht']} kg")
+        print(f"Volume: {workout['volume']} kg")
+
+
+def bereken_totaal_volume(workouts):
+    totaal = 0
+
+    for workout in workouts:
+        totaal += workout["volume"]
+
+    return totaal
+
+
+def vind_zwaarste_workout(workouts):
+    zwaarste_workout = workouts[0]
+
+    for workout in workouts:
+        if workout["volume"] > zwaarste_workout["volume"]:
+            zwaarste_workout = workout
+
+    return zwaarste_workout
+
+
+def vind_meest_getrainde_oefening(workouts):
+    oefeningen = {}
+
+    for workout in workouts:
+        oefening = workout["oefening"].lower()
+
+        if oefening in oefeningen:
+            oefeningen[oefening] += 1
+        else:
+            oefeningen[oefening] = 1
+
+    meest_getraind = max(oefeningen, key=oefeningen.get)
+
+    return meest_getraind, oefeningen[meest_getraind]
+
+
+def toon_progressie():
+    workouts = lees_workouts()
+
+    print("\n--- Progressie overzicht ---")
+
+    if len(workouts) == 0:
+        print("Er zijn nog geen workouts opgeslagen.")
+        return
+
+    aantal_workouts = len(workouts)
+    totaal_volume = bereken_totaal_volume(workouts)
+    gemiddeld_volume = totaal_volume / aantal_workouts
+    zwaarste_workout = vind_zwaarste_workout(workouts)
+    meest_getraind, aantal_keer = vind_meest_getrainde_oefening(workouts)
+
+    print(f"Aantal workouts: {aantal_workouts}")
+    print(f"Totaal trainingsvolume: {round(totaal_volume, 2)} kg")
+    print(f"Gemiddeld volume per workout: {round(gemiddeld_volume, 2)} kg")
+
+    print("\nZwaarste workout:")
+    print(f"Oefening: {zwaarste_workout['oefening']}")
+    print(f"Datum: {zwaarste_workout['datum']}")
+    print(f"Volume: {zwaarste_workout['volume']} kg")
+
+    print("\nMeest getrainde oefening:")
+    print(f"Oefening: {meest_getraind}")
+    print(f"Aantal keer: {aantal_keer}")
+
+
 def toon_menu():
     print("\n--- FitHelper ---")
     print("1. Profiel aanmaken")
     print("2. Workout toevoegen")
+    print("3. Workouts bekijken")
+    print("4. Progressie bekijken")
     print("0. Afsluiten")
 
 
@@ -213,6 +277,12 @@ def main():
             workout = maak_workout()
             sla_workout_op(workout)
             toon_workout_overzicht(workout)
+
+        elif keuze == "3":
+            toon_alle_workouts()
+
+        elif keuze == "4":
+            toon_progressie()
 
         elif keuze == "0":
             print("Programma afgesloten.")

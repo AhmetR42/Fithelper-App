@@ -6,5 +6,29 @@
         "reps": 6,
         "gewicht": 134.0,
         "volume": 2412.0
+    },
+    {
+        "datum": "2026-02-10",
+        "oefening": "leg press",
+        "sets": 2,
+        "reps": 10,
+        "gewicht": 240.0,
+        "volume": 4800.0
+    },
+    {
+        "datum": "2026-06-01",
+        "oefening": "squat",
+        "sets": 2,
+        "reps": 5,
+        "gewicht": 180.0,
+        "volume": 1800.0
+    },
+    {
+        "datum": "2026-06-01",
+        "oefening": "deadlift",
+        "sets": 4,
+        "reps": 6,
+        "gewicht": 120.0,
+        "volume": 2880.0
     }
 ]
