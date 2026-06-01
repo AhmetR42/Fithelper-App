@@ -152,6 +152,66 @@ def sla_workout_op(workout):
     print("\nWorkout succesvol opgeslagen in data/workouts.json.")
 
 
+def lees_gewichten():
+    try:
+        with open("data/weights.json", "r", encoding="utf-8") as bestand:
+            return json.load(bestand)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+
+def voeg_gewicht_toe():
+    print("\n--- Gewicht toevoegen ---")
+
+    gewicht = vraag_getal("Wat is je gewicht in kg? ", 30, 250)
+    datum = input("Datum (YYYY-MM-DD), laat leeg voor vandaag: ").strip()
+
+    if datum == "":
+        datum = str(date.today())
+
+    gewicht_data = {
+        "datum": datum,
+        "gewicht": gewicht
+    }
+
+    gewichten = lees_gewichten()
+    gewichten.append(gewicht_data)
+
+    os.makedirs("data", exist_ok=True)
+
+    with open("data/weights.json", "w", encoding="utf-8") as bestand:
+        json.dump(gewichten, bestand, indent=4, ensure_ascii=False)
+
+    print("\nGewicht succesvol opgeslagen in data/weights.json.")
+
+
+def toon_gewicht_geschiedenis():
+    gewichten = lees_gewichten()
+
+    print("\n--- Gewicht geschiedenis ---")
+
+    if len(gewichten) == 0:
+        print("Er zijn nog geen gewichten opgeslagen.")
+        return
+
+    for index, gewicht_data in enumerate(gewichten, start=1):
+        print(f"\nMeting {index}")
+        print(f"Datum: {gewicht_data['datum']}")
+        print(f"Gewicht: {gewicht_data['gewicht']} kg")
+
+    if len(gewichten) >= 2:
+        startgewicht = gewichten[0]["gewicht"]
+        laatste_gewicht = gewichten[-1]["gewicht"]
+        verschil = laatste_gewicht - startgewicht
+
+        print("\n--- Gewicht progressie ---")
+        print(f"Startgewicht: {startgewicht} kg")
+        print(f"Laatste gewicht: {laatste_gewicht} kg")
+        print(f"Verschil: {round(verschil, 2)} kg")
+
+
 def toon_profiel_overzicht(profiel):
     print("\n--- Profiel overzicht ---")
     print(f"Naam: {profiel['naam']}")
@@ -169,25 +229,6 @@ def toon_workout_overzicht(workout):
     print(f"Reps: {workout['reps']}")
     print(f"Gewicht: {workout['gewicht']} kg")
     print(f"Volume: {workout['volume']} kg")
-
-
-def toon_alle_workouts():
-    workouts = lees_workouts()
-
-    print("\n--- Workout geschiedenis ---")
-
-    if len(workouts) == 0:
-        print("Er zijn nog geen workouts opgeslagen.")
-        return
-
-    for index, workout in enumerate(workouts, start=1):
-        print(f"\nWorkout {index}")
-        print(f"Datum: {workout['datum']}")
-        print(f"Oefening: {workout['oefening']}")
-        print(f"Sets: {workout['sets']}")
-        print(f"Reps: {workout['reps']}")
-        print(f"Gewicht: {workout['gewicht']} kg")
-        print(f"Volume: {workout['volume']} kg")
 
 
 def toon_alle_workouts():
@@ -277,6 +318,10 @@ def toon_menu():
     print("\n--- FitHelper ---")
     print("1. Profiel aanmaken")
     print("2. Workout toevoegen")
+    print("3. Workouts bekijken")
+    print("4. Progressie bekijken")
+    print("5. Gewicht toevoegen")
+    print("6. Gewicht geschiedenis bekijken")
     print("0. Afsluiten")
 
 
@@ -294,6 +339,18 @@ def main():
             workout = maak_workout()
             sla_workout_op(workout)
             toon_workout_overzicht(workout)
+
+        elif keuze == "3":
+            toon_alle_workouts()
+
+        elif keuze == "4":
+            toon_progressie()
+
+        elif keuze == "5":
+            voeg_gewicht_toe()
+
+        elif keuze == "6":
+            toon_gewicht_geschiedenis()
 
         elif keuze == "0":
             print("Programma afgesloten.")
