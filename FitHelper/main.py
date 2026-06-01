@@ -154,17 +154,20 @@ def maak_workout():
     return workout
 
 
+def lees_workouts():
+    try:
+        with open("data/workouts.json", "r", encoding="utf-8") as bestand:
+            return json.load(bestand)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+
 def sla_workout_op(workout):
     os.makedirs("data", exist_ok=True)
 
-    try:
-        with open("data/workouts.json", "r", encoding="utf-8") as bestand:
-            workouts = json.load(bestand)
-    except FileNotFoundError:
-        workouts = []
-    except json.JSONDecodeError:
-        workouts = []
-
+    workouts = lees_workouts()
     workouts.append(workout)
 
     with open("data/workouts.json", "w", encoding="utf-8") as bestand:
@@ -192,10 +195,30 @@ def toon_workout_overzicht(workout):
     print(f"Volume: {workout['volume']} kg")
 
 
+def toon_alle_workouts():
+    workouts = lees_workouts()
+
+    print("\n--- Workout geschiedenis ---")
+
+    if len(workouts) == 0:
+        print("Er zijn nog geen workouts opgeslagen.")
+        return
+
+    for index, workout in enumerate(workouts, start=1):
+        print(f"\nWorkout {index}")
+        print(f"Datum: {workout['datum']}")
+        print(f"Oefening: {workout['oefening']}")
+        print(f"Sets: {workout['sets']}")
+        print(f"Reps: {workout['reps']}")
+        print(f"Gewicht: {workout['gewicht']} kg")
+        print(f"Volume: {workout['volume']} kg")
+
+
 def toon_menu():
     print("\n--- FitHelper ---")
     print("1. Profiel aanmaken")
     print("2. Workout toevoegen")
+    print("3. Workouts bekijken")
     print("0. Afsluiten")
 
 
@@ -213,6 +236,9 @@ def main():
             workout = maak_workout()
             sla_workout_op(workout)
             toon_workout_overzicht(workout)
+
+        elif keuze == "3":
+            toon_alle_workouts()
 
         elif keuze == "0":
             print("Programma afgesloten.")
