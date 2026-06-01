@@ -190,6 +190,25 @@ def toon_alle_workouts():
         print(f"Volume: {workout['volume']} kg")
 
 
+def toon_alle_workouts():
+    workouts = lees_workouts()
+
+    print("\n--- Workout geschiedenis ---")
+
+    if len(workouts) == 0:
+        print("Er zijn nog geen workouts opgeslagen.")
+        return
+
+    for index, workout in enumerate(workouts, start=1):
+        print(f"\nWorkout {index}")
+        print(f"Datum: {workout['datum']}")
+        print(f"Oefening: {workout['oefening']}")
+        print(f"Sets: {workout['sets']}")
+        print(f"Reps: {workout['reps']}")
+        print(f"Gewicht: {workout['gewicht']} kg")
+        print(f"Volume: {workout['volume']} kg")
+
+
 def bereken_totaal_volume(workouts):
     totaal = 0
 
@@ -258,8 +277,6 @@ def toon_menu():
     print("\n--- FitHelper ---")
     print("1. Profiel aanmaken")
     print("2. Workout toevoegen")
-    print("3. Workouts bekijken")
-    print("4. Progressie bekijken")
     print("0. Afsluiten")
 
 
@@ -277,12 +294,6 @@ def main():
             workout = maak_workout()
             sla_workout_op(workout)
             toon_workout_overzicht(workout)
-
-        elif keuze == "3":
-            toon_alle_workouts()
-
-        elif keuze == "4":
-            toon_progressie()
 
         elif keuze == "0":
             print("Programma afgesloten.")
