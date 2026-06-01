@@ -6,10 +6,8 @@ from datetime import date
 def vraag_tekst(vraag):
     while True:
         antwoord = input(vraag).strip()
-
         if antwoord:
             return antwoord
-
         print("Dit veld mag niet leeg zijn. Probeer opnieuw.")
 
 
@@ -17,12 +15,9 @@ def vraag_getal(vraag, minimum, maximum):
     while True:
         try:
             waarde = float(input(vraag))
-
             if minimum <= waarde <= maximum:
                 return waarde
-
             print(f"Voer een getal in tussen {minimum} en {maximum}.")
-
         except ValueError:
             print("Ongeldige invoer. Voer een geldig getal in.")
 
@@ -39,8 +34,7 @@ def geef_bmi_advies(bmi):
         return "Je hebt een gezond gewicht. Blijf zo doorgaan."
     elif bmi < 30:
         return "Je hebt overgewicht. Meer beweging en gezondere keuzes kunnen helpen."
-    else:
-        return "Je hebt obesitas. Overweeg om professioneel advies te vragen."
+    return "Je hebt obesitas. Overweeg om professioneel advies te vragen."
 
 
 def geef_leefstijl_advies(keuze):
@@ -52,15 +46,13 @@ def geef_leefstijl_advies(keuze):
         return "Probeer regelmatig te bewegen en kies sporten die je vol kunt houden."
     elif keuze == "beide":
         return "Combineer gezonde voeding met regelmatige training voor het beste resultaat."
-    else:
-        return "Ongeldige keuze. Kies 'voeding', 'beweging' of 'beide'."
+    return "Ongeldige keuze. Kies 'voeding', 'beweging' of 'beide'."
 
 
 def maak_profiel():
     print("\n--- Profiel aanmaken ---")
 
     naam = vraag_tekst("Wat is je naam? ")
-
     print(f"\nHallo {naam}! Welkom bij de FitHelper app.\n")
 
     leeftijd = int(vraag_getal("Wat is je leeftijd? ", 10, 100))
@@ -97,6 +89,33 @@ def sla_profiel_op(profiel):
         json.dump(profiel, bestand, indent=4, ensure_ascii=False)
 
     print("\nProfiel is succesvol opgeslagen in data/user.json.")
+
+
+def lees_profiel():
+    try:
+        with open("data/user.json", "r", encoding="utf-8") as bestand:
+            return json.load(bestand)
+    except FileNotFoundError:
+        return None
+    except json.JSONDecodeError:
+        return None
+
+
+def toon_opgeslagen_profiel():
+    profiel = lees_profiel()
+
+    if profiel is None:
+        print("\nEr is nog geen profiel opgeslagen.")
+        return
+
+    print("\n--- Opgeslagen profiel ---")
+    print(f"Naam: {profiel['naam']}")
+    print(f"Leeftijd: {profiel['leeftijd']}")
+    print(f"Gewicht: {profiel['gewicht']} kg")
+    print(f"Lengte: {profiel['lengte']} cm")
+    print(f"BMI: {profiel['bmi']}")
+    print(f"Advies keuze: {profiel['advies_keuze']}")
+    print(f"Advies: {profiel['leefstijl_advies']}")
 
 
 def bereken_volume(sets, reps, gewicht):
@@ -140,16 +159,81 @@ def lees_workouts():
         return []
 
 
-def sla_workout_op(workout):
+def schrijf_workouts(workouts):
     os.makedirs("data", exist_ok=True)
-
-    workouts = lees_workouts()
-    workouts.append(workout)
 
     with open("data/workouts.json", "w", encoding="utf-8") as bestand:
         json.dump(workouts, bestand, indent=4, ensure_ascii=False)
 
+
+def sla_workout_op(workout):
+    workouts = lees_workouts()
+    workouts.append(workout)
+    schrijf_workouts(workouts)
+
     print("\nWorkout succesvol opgeslagen in data/workouts.json.")
+
+
+def toon_workout_overzicht(workout):
+    print("\n--- Workout overzicht ---")
+    print(f"Datum: {workout['datum']}")
+    print(f"Oefening: {workout['oefening']}")
+    print(f"Sets: {workout['sets']}")
+    print(f"Reps: {workout['reps']}")
+    print(f"Gewicht: {workout['gewicht']} kg")
+    print(f"Volume: {workout['volume']} kg")
+
+
+def toon_alle_workouts():
+    workouts = lees_workouts()
+
+    print("\n--- Workout geschiedenis ---")
+
+    if len(workouts) == 0:
+        print("Er zijn nog geen workouts opgeslagen.")
+        return
+
+    for index, workout in enumerate(workouts, start=1):
+        print(f"\nWorkout {index}")
+        print(f"Datum: {workout['datum']}")
+        print(f"Oefening: {workout['oefening']}")
+        print(f"Sets: {workout['sets']}")
+        print(f"Reps: {workout['reps']}")
+        print(f"Gewicht: {workout['gewicht']} kg")
+        print(f"Volume: {workout['volume']} kg")
+
+
+def verwijder_workout():
+    workouts = lees_workouts()
+
+    if len(workouts) == 0:
+        print("\nEr zijn geen workouts om te verwijderen.")
+        return
+
+    print("\n--- Workout verwijderen ---")
+
+    for index, workout in enumerate(workouts, start=1):
+        print(
+            f"{index}. {workout['datum']} - "
+            f"{workout['oefening']} ({workout['volume']} kg)"
+        )
+
+    try:
+        keuze = int(input("\nWelke workout wil je verwijderen? "))
+
+        if 1 <= keuze <= len(workouts):
+            verwijderde_workout = workouts.pop(keuze - 1)
+            schrijf_workouts(workouts)
+
+            print(
+                f"\nWorkout '{verwijderde_workout['oefening']}' "
+                "is verwijderd."
+            )
+        else:
+            print("Ongeldige keuze.")
+
+    except ValueError:
+        print("Voer een geldig nummer in.")
 
 
 def lees_gewichten():
@@ -219,35 +303,6 @@ def toon_profiel_overzicht(profiel):
     print(f"Gewicht: {profiel['gewicht']} kg")
     print(f"Lengte: {profiel['lengte']} cm")
     print(f"BMI: {profiel['bmi']}")
-
-
-def toon_workout_overzicht(workout):
-    print("\n--- Workout overzicht ---")
-    print(f"Datum: {workout['datum']}")
-    print(f"Oefening: {workout['oefening']}")
-    print(f"Sets: {workout['sets']}")
-    print(f"Reps: {workout['reps']}")
-    print(f"Gewicht: {workout['gewicht']} kg")
-    print(f"Volume: {workout['volume']} kg")
-
-
-def toon_alle_workouts():
-    workouts = lees_workouts()
-
-    print("\n--- Workout geschiedenis ---")
-
-    if len(workouts) == 0:
-        print("Er zijn nog geen workouts opgeslagen.")
-        return
-
-    for index, workout in enumerate(workouts, start=1):
-        print(f"\nWorkout {index}")
-        print(f"Datum: {workout['datum']}")
-        print(f"Oefening: {workout['oefening']}")
-        print(f"Sets: {workout['sets']}")
-        print(f"Reps: {workout['reps']}")
-        print(f"Gewicht: {workout['gewicht']} kg")
-        print(f"Volume: {workout['volume']} kg")
 
 
 def bereken_totaal_volume(workouts):
@@ -322,6 +377,8 @@ def toon_menu():
     print("4. Progressie bekijken")
     print("5. Gewicht toevoegen")
     print("6. Gewicht geschiedenis bekijken")
+    print("7. Workout verwijderen")
+    print("8. Profiel bekijken")
     print("0. Afsluiten")
 
 
@@ -351,6 +408,12 @@ def main():
 
         elif keuze == "6":
             toon_gewicht_geschiedenis()
+
+        elif keuze == "7":
+            verwijder_workout()
+
+        elif keuze == "8":
+            toon_opgeslagen_profiel()
 
         elif keuze == "0":
             print("Programma afgesloten.")
