@@ -1,0 +1,9 @@
+{
+    "naam": "Ahmet",
+    "leeftijd": 21,
+    "gewicht": 90.0,
+    "lengte": 183.0,
+    "bmi": 26.87,
+    "advies_keuze": "beide",
+    "leefstijl_advies": "Combineer gezonde voeding met regelmatige training voor het beste resultaat."
+}
