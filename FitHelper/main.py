@@ -1,3 +1,13 @@
+"""
+Feedback voor opdracht 2 verwerkt:
+- Lege Python bestanden verwijderd.
+- Bronvermeldingen toegevoegd bij testbestand.
+
+Ik heb gekozen om JSON te blijven gebruiken in plaats van sqlite3,
+omdat dit beter past bij mijn huidige niveau en omdat de app hiermee stabiel werkt.
+"""
+
+
 import json
 import os
 from datetime import date
