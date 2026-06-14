@@ -1,3 +1,13 @@
+"""
+Bronnen:
+- Pytest documentatie: https://docs.pytest.org/en/stable/
+- Python sys module: https://docs.python.org/3/library/sys.html
+- Python pathlib module: https://docs.python.org/3/library/pathlib.html
+
+Ik gebruik sys.path.insert zodat pytest mijn main.py bestand kan vinden
+wanneer de tests vanuit de tests-map worden uitgevoerd.
+"""
+
 import sys
 from pathlib import Path
 
